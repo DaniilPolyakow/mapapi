@@ -3,7 +3,7 @@ import sys
 
 import requests
 from PyQt5 import uic
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QWheelEvent
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QMainWindow
 
 SCREEN_SIZE = [600, 450]
@@ -18,8 +18,8 @@ class StaticMap(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.getImage()
         self.initUI()
+        self.getImage()
 
     def getImage(self):
         map_params = {
@@ -34,15 +34,17 @@ class StaticMap(QMainWindow):
             print(self.map_api_server)
             print("Http статус:", response.status_code, "(", response.reason, ")")
 
+        # Запишем полученное изображение в файл.
         self.map_file = "map.png"
         with open(self.map_file, "wb") as file:
             file.write(response.content)
 
-    def initUI(self):
-        uic.loadUi('static_map.ui', self)  # Загружаем дизайн
-
+        ## Изображение
         self.pixmap = QPixmap(self.map_file)
         self.image.setPixmap(self.pixmap)
+
+    def initUI(self):
+        uic.loadUi('static_map.ui', self)  # Загружаем дизайн
 
     def wheelEvent(self, event: QWheelEvent) -> None:
         if event.angleDelta().y() > 0:
